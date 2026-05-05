@@ -25,7 +25,7 @@ app.include_router(import_data.router, prefix="/api/import",       tags=["است
 app.include_router(admin.router,       prefix="/api/admin",        tags=["أدمن"])
 
 # Serve frontend
-FRONTEND = os.path.join(os.path.dirname(__file__), "..", "frontend")
+FRONTEND = os.path.join(os.getcwd(),"frontend")
 app.mount("/static", StaticFiles(directory=FRONTEND), name="static")
 
 @app.get("/")
