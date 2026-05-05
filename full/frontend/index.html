@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>منصة قبيلة الباهادي | الموسوعة الرقمية</title>
+<meta name="description" content="المرجع الرقمي الرسمي لقبيلة الباهادي — شجرة العائلة، المآثر، وذاكرة الأجيال"/>
+<link rel="stylesheet" href="css/style.css"/>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">ب</div>
+    <span class="nav-title">قبيلة الباهادي</span>
+  </div>
+  <div class="nav-links">
+    <a onclick="scrollTo('hero')" class="active" id="nav-hero">الرئيسية</a>
+    <a onclick="scrollTo('tree-section')" id="nav-tree">شجرة العائلة</a>
+    <a onclick="scrollTo('chat-section')" id="nav-chat">اكتشف قرابتك</a>
+    <a onclick="scrollTo('members-section')" id="nav-members">المآثر</a>
+    <a onclick="scrollTo('events-section')" id="nav-events">الديوانية</a>
+    <a onclick="openAdmin()" class="nav-admin-btn">⚙ الإدارة</a>
+  </div>
+  <button class="nav-toggle" onclick="toggleMobileMenu()">☰</button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-close" onclick="toggleMobileMenu()">✕</button>
+  <div class="mobile-links">
+    <a onclick="scrollTo('hero'); toggleMobileMenu()">الرئيسية</a>
+    <a onclick="scrollTo('tree-section'); toggleMobileMenu()">شجرة العائلة</a>
+    <a onclick="scrollTo('chat-section'); toggleMobileMenu()">اكتشف قرابتك</a>
+    <a onclick="scrollTo('members-section'); toggleMobileMenu()">أعلام القبيلة</a>
+    <a onclick="scrollTo('events-section'); toggleMobileMenu()">الديوانية</a>
+    <a onclick="openAdmin(); toggleMobileMenu()" class="gold">⚙ الإدارة</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-particles" id="particles"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🌿 المرجع الرقمي الرسمي</div>
+    <h1 class="hero-title">قبيلة الباهادي</h1>
+    <p class="hero-sub">موسوعة رقمية تجمع أبناء الباهادي في مختلف البلدان<br/>شجرة العائلة · المآثر · ذاكرة الأجيال</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" id="stat-members">٠</div><div class="stat-label">فرداً موثّقاً</div></div>
+      <div class="stat"><div class="stat-num" id="stat-countries">٠</div><div class="stat-label">دولة</div></div>
+      <div class="stat"><div class="stat-num" id="stat-gen">٤</div><div class="stat-label">أجيال</div></div>
+    </div>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="scrollTo('tree-section')">🌳 استعرض الشجرة</button>
+      <button class="btn-outline" onclick="scrollTo('chat-section')">🔍 اكتشف قرابتك</button>
+    </div>
+  </div>
+</div>
+
+<!-- TREE -->
+<section id="tree-section">
+  <div class="section-header">
+    <span class="section-tag">شجرة العائلة</span>
+    <h2 class="section-title">الشجرة التفاعلية <span class="gold">للباهادي</span></h2>
+    <p class="section-desc">اضغط على أي اسم لعرض ملفه الكامل · سحب وتكبير/تصغير</p>
+    <div class="divider"></div>
+  </div>
+  <div id="tree-canvas-wrap">
+    <div id="tree-loading">جاري تحميل الشجرة...</div>
+    <svg id="tree-canvas"></svg>
+    <div class="tree-controls">
+      <div class="tree-search-wrap">
+        <input type="text" id="tree-search" placeholder="ابحث عن اسم..." oninput="highlightNode(this.value)"/>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button onclick="zoomIn()">➕</button>
+        <button onclick="zoomOut()">➖</button>
+        <button onclick="resetTree()">🏠</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT AI -->
+<div id="chat-section" style="padding:6rem 2rem; border-top:1px solid var(--border);">
+  <div class="section-header">
+    <span class="section-tag">الذكاء الاصطناعي</span>
+    <h2 class="section-title">اكتشف <span class="gold">صلة قرابتك</span></h2>
+    <p class="section-desc">اختر شخصين وسيُحلّل النظام شجرة العائلة ويشرح لك صلة القرابة بدقة</p>
+    <div class="divider"></div>
+  </div>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-icon">🤖</div>
+      <div>
+        <div class="chat-title">مساعد القرابة الذكي</div>
+        <div class="chat-subtitle">● يعمل بخوارزميات تحليل الشجرة</div>
+      </div>
+    </div>
+    <div class="chat-selectors">
+      <div>
+        <label>الشخص الأول</label>
+        <select id="person1-select"><option value="">-- اختر شخصاً --</option></select>
+      </div>
+      <div>
+        <label>الشخص الثاني</label>
+        <select id="person2-select"><option value="">-- اختر شخصاً --</option></select>
+      </div>
+      <button class="btn-primary" onclick="findRelationship()">🔍 تحليل</button>
+    </div>
+    <div class="chat-result" id="chat-result">
+      <div class="chat-placeholder">
+        <div class="icon">🧬</div>
+        <p>اختر شخصين لمعرفة صلة القرابة</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+<section id="members-section">
+  <div class="section-header">
+    <span class="section-tag">أرشيف المآثر</span>
+    <h2 class="section-title">أعلام <span class="gold">الباهادي</span></h2>
+    <p class="section-desc">شخصيات بارزة من أبناء القبيلة حول العالم</p>
+    <div class="divider"></div>
+  </div>
+  <div class="members-grid" id="members-grid">
+    <div class="spinner"></div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="events-section" style="border-top:1px solid var(--border);">
+  <div class="section-header">
+    <span class="section-tag">الأخبار والأحداث</span>
+    <h2 class="section-title">ديوانية <span class="gold">الباهادي</span></h2>
+    <p class="section-desc">آخر أخبار وأحداث القبيلة من مختلف البلدان</p>
+    <div class="divider"></div>
+  </div>
+  <div class="events-list" id="events-list">
+    <div class="spinner"></div>
+  </div>
+</section>
+
+<!-- ADMIN LOCK -->
+<div id="admin-lock" style="display: none;">
+  <div class="lock-card">
+    <div style="font-size:3rem;margin-bottom:1rem;">🔐</div>
+    <h2>منطقة الإدارة المشفرة</h2>
+    <p style="color:var(--text2);margin-bottom:2rem;">هذه المنطقة مخصصة للمهندس عمر سالم باهادي فقط. يرجى إدخال رمز التحقق للمتابعة.</p>
+    <input type="password" id="admin-pass" placeholder="رمز الدخول" onkeypress="if(event.key==='Enter') loginAdmin()"/>
+    <button class="btn-primary" style="width:100%" onclick="loginAdmin()">تأكيد الهوية</button>
+    <button class="btn-outline" style="width:100%; margin-top: 1rem; border:none;" onclick="document.getElementById('admin-lock').style.display='none'">إلغاء</button>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="admin-section" style="padding:6rem 2rem; background:var(--bg); border-top:1px solid var(--border); display:none;">
+  <div style="max-width:1400px;margin:0 auto;">
+    <div class="section-header">
+      <span class="section-tag">لوحة التحكم الاحترافية</span>
+      <h2 class="section-title">إدارة <span class="gold">شجرة الباهادي</span></h2>
+      <p class="section-desc">مرحباً بك يا مدير النظام، لديك الصلاحيات الكاملة لإدارة محتوى المنصة</p>
+      <div class="divider"></div>
+    </div>
+
+    <!-- Stats Dashboard Summary -->
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="icon">👥</div>
+        <div class="info"><div class="num" id="d-total">٠</div><div class="label">إجمالي القبيلة</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon" style="color:#e67e22">⏳</div>
+        <div class="info"><div class="num" id="d-pending">٠</div><div class="label">طلبات معلقة</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon" style="color:#2ecc71">🏆</div>
+        <div class="info"><div class="num" id="d-notable">٠</div><div class="label">شخصيات موثقة</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon" style="color:#3498db">📰</div>
+        <div class="info"><div class="num" id="d-events">٠</div><div class="label">أخبار منشورة</div></div>
+      </div>
+    </div>
+
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <div class="admin-sidebar">
+        <button class="side-btn active" onclick="showAdminTab('tab-dash', this)">📊 لوحة الملخص</button>
+        <button class="side-btn" onclick="showAdminTab('tab-add', this)">👤 إضافة فرد</button>
+        <button class="side-btn" onclick="showAdminTab('tab-validation', this)">🧬 مركز مراجعة AI</button>
+        <button class="side-btn" onclick="showAdminTab('tab-list', this)">📋 قائمة الأعضاء</button>
+        <button class="side-btn" onclick="showAdminTab('tab-event', this)">📢 الديوانية</button>
+        <button class="side-btn" onclick="showAdminTab('tab-import', this)">📥 استيراد CSV</button>
+        <button class="btn-danger" style="margin-top:2rem;width:100%" onclick="logoutAdmin()">🚪 خروج</button>
+      </div>
+
+      <!-- Main Content -->
+      <div class="admin-main">
+        <!-- Tab: Dashboard Summary View -->
+        <div class="admin-tab-content active" id="tab-dash">
+           <div class="card-glass" style="padding:2rem;">
+             <h3>آخر الطلبات المعلقة</h3>
+             <div id="quick-pending-list" style="margin-top:1rem;"></div>
+           </div>
+        </div>
+
+        <!-- Tab: AI Validation Center -->
+        <div class="admin-tab-content" id="tab-validation">
+          <div class="card-glass" style="padding:2rem;">
+            <h3>مركز مراجعة البيانات (AI Validation)</h3>
+            <p style="color:var(--text2);margin-bottom:1.5rem;">البيانات التي تم استخراجها من ملفات PDF/CSV بانتظار مراجعتك واعتمادها للنشر في الشجرة.</p>
+            <div style="overflow-x:auto;">
+              <table class="pending-table">
+                <thead><tr><th>الاسم</th><th>الجيل</th><th>الدولة</th><th>الوالد</th><th>إجراءات</th></tr></thead>
+                <tbody id="pending-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Member (Existing Form relocated) -->
+        <div class="admin-tab-content" id="tab-add">
+          <div class="form-grid">
+            <div class="form-group"><label>الاسم الكامل *</label><input id="f-name" placeholder="سالم بن محمد الباهادي"/></div>
+            <div class="form-group"><label>الجنس</label>
+              <select id="f-gender">
+                <option value="male">ذكر</option>
+                <option value="female">أنثى</option>
+              </select>
+            </div>
+            <div class="form-group"><label>الجيل</label><input id="f-gen" type="number" value="3"/></div>
+            <div class="form-group"><label>الدولة</label><input id="f-country" value="السعودية"/></div>
+            <div class="form-group"><label>سنة الميلاد</label><input id="f-birth" type="number" placeholder="مثلاً: 1950"/></div>
+            <div class="form-group"><label>سنة الوفاة (إن وجد)</label><input id="f-death" type="number" placeholder="مثلاً: 2020"/></div>
+            <div class="form-group"><label>مكان الميلاد</label><input id="f-birthplace" placeholder="مثلاً: حضرموت - عمد"/></div>
+            <div class="form-group"><label>اللقب / الدور</label><input id="f-role" placeholder="مثلاً: مزارع، تاجر، شيخ..."/></div>
+            <div class="form-group"><label>الوالد</label><select id="f-parent"><option value="">-- بلا ربط (رأس شجرة) --</option></select></div>
+            <div class="form-group" style="grid-column:1/-1"><label>السيرة الذاتية</label><textarea id="f-bio" placeholder="نبذة عن حياته..."></textarea></div>
+            <div class="form-group" style="grid-column:1/-1"><label>المآثر والإنجازات</label><textarea id="f-achievements" placeholder="أهم أعماله وإنجازاته..."></textarea></div>
+          </div>
+          <button class="btn-success" style="margin-top:1rem" onclick="addMember()">حفظ ونشر</button>
+        </div>
+
+        <!-- Members List -->
+        <div class="admin-tab-content" id="tab-list">
+          <div style="overflow-x:auto;">
+            <table class="pending-table" id="admin-members-table">
+              <thead><tr><th>#</th><th>الاسم</th><th>الجيل</th><th>إجراءات</th></tr></thead>
+              <tbody id="admin-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab: Post Event -->
+        <div class="admin-tab-content" id="tab-event">
+          <div class="card-glass" style="padding:2rem;">
+            <h3>نشر خبر في الديوانية</h3>
+            <div class="form-grid" style="margin-top:1.5rem;">
+              <div class="form-group"><label>عنوان الخبر *</label><input id="e-title" placeholder="تخرج فلان..."/></div>
+              <div class="form-group"><label>نوع الحدث</label>
+                <select id="e-type">
+                  <option value="news">📰 خبر عام</option>
+                  <option value="birth">👶 مولود جديد</option>
+                  <option value="achievement">🏆 إنجاز</option>
+                  <option value="death">🕊 وفاة</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column:1/-1"><label>تفاصيل الخبر</label><textarea id="e-content"></textarea></div>
+            </div>
+            <button class="btn-success" style="margin-top:1rem" onclick="postEvent()">📢 نشر الآن</button>
+          </div>
+        </div>
+
+        <!-- Tab: Import CSV -->
+        <div class="admin-tab-content" id="tab-import">
+          <div class="card-glass" style="padding:2rem;">
+            <h3>استيراد بيانات القبيلة (CSV)</h3>
+            <p style="color:var(--text2);margin-bottom:1.5rem;">يمكنك رفع ملف CSV يحتوي على مئات الأسماء وسيتم تحويلها لطلبات "معلقة" للمراجعة.</p>
+            <div class="upload-area" onclick="document.getElementById('csv-file').click()" style="border:2px dashed var(--border);padding:3rem;text-align:center;border-radius:20px;cursor:pointer;">
+              <div style="font-size:3rem;margin-bottom:1rem;">📥</div>
+              <p>اضغط لاختيار ملف CSV</p>
+              <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="uploadCSV(this)"/>
+            </div>
+            <div id="import-result" style="margin-top:1.5rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">الباهادي</div>
+  <p class="footer-text">منصة قبيلة الباهادي الرقمية · جميع الحقوق محفوظة © 2025</p>
+  <div class="footer-designer" style="margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem; font-size:0.8rem; color:var(--text2);">
+    <p>تصميم وتطوير: <span style="color:var(--gold); font-weight:700;">المهندس عمر سالم باهادي</span></p>
+    <p style="margin-top:0.5rem; letter-spacing:1px; font-family:monospace;">Eng. OMER SALEM BAHADI / 780435717</p>
+  </div>
+</footer>
+
+<!-- MEMBER MODAL -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <div class="modal-name" id="m-name">-</div>
+        <div class="modal-role" id="m-role">-</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta" id="m-meta"></div>
+      <p class="modal-bio" id="m-bio"></p>
+      <div id="m-achievements" style="margin-bottom:1.5rem;display:none;">
+        <h4 style="color:var(--gold);margin-bottom:0.75rem;">🏆 المآثر والإنجازات</h4>
+        <p style="color:var(--text2);line-height:1.8;" id="m-ach-text"></p>
+      </div>
+      <div id="m-timeline-wrap" style="display:none;">
+        <h4 style="color:var(--gold);margin-bottom:1rem;">📅 الخط الزمني</h4>
+        <div class="timeline" id="m-timeline"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="js/tree.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
